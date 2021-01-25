@@ -6,6 +6,7 @@ import passportLocal from 'passport-local';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import bcrypt from 'bcryptjs';
+import User from './User';
 import dotenv from 'dotenv';
 
 mongoose.connect("mongodb+srv://manu:manucho7@passportcluster.jmn63.mongodb.net/<dbname>?retryWrites=true&w=majority", {
@@ -17,3 +18,19 @@ mongoose.connect("mongodb+srv://manu:manucho7@passportcluster.jmn63.mongodb.net/
     console.log('DB is online')
 });
 
+//Middlewares
+const app = express();
+app.use(express.json());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }))
+app.use(
+  session({
+    secret: "secretCode",
+    resave: true,
+    saveUninitialized: true
+  })
+);
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
