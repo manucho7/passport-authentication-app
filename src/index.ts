@@ -1,5 +1,5 @@
 import mongoose, { Error } from 'mongoose';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import passport from 'passport';
 import passportLocal from 'passport-local';
@@ -34,3 +34,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
+app.post('/register', async (req: Request, res: Response) => {
+  //username and password
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const newUser = new User({
+    username: req.body.username,
+    password: hashedPassword
+  });
+
+  await newUser.save();
+  res.send('Success');
+
+});
+
+app.listen('4000', () => {
+  console.log("Server started successfully");
+});
