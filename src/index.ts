@@ -8,6 +8,7 @@ import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import User from './User';
 import dotenv from 'dotenv';
+import { UserInterface } from './Interfaces/UserInterface';
 
 mongoose.connect("mongodb+srv://manu:manucho7@passportcluster.jmn63.mongodb.net/<dbname>?retryWrites=true&w=majority", {
   useCreateIndex: true,
@@ -44,8 +45,8 @@ app.post('/register', async (req: Request, res: Response) => {
   }
 
   //Check DB to see if user already exists
-  User.findOne({ username }, async (err: Error, doc: any) => {
-    if ( err ) throw err;
+  User.findOne({ username }, async (err: Error, doc: UserInterface) => {
+    if (err) throw err;
     if (doc) res.send("User already exists in Database");
     if (!doc) {
       const hashedPassword = await bcrypt.hash(password, 10);
