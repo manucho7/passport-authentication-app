@@ -36,14 +36,28 @@ app.use(passport.session());
 // Routes
 app.post('/register', async (req: Request, res: Response) => {
   //username and password
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  const newUser = new User({
-    username: req.body.username,
-    password: hashedPassword
-  });
+  const { username, password } = req?.body;
+  //Validation for our endpoint = no invalid credentials
+  if (!username || !password || typeof username !== "string"  || typeof password !== "string" ) {
+    res.send("Credentials are not valid");
+    return;
+  }
 
-  await newUser.save();
-  res.send('Success');
+  //Check DB to see if user already exists
+  User.findOne({ username }, async (err: Error, doc: any) => {
+    if ( err ) throw err;
+    if (doc) res.send("User already exists in Database");
+    if (!doc) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        username,
+        password: hashedPassword
+      });
+    
+      await newUser.save();
+      res.send('Success');
+    }
+  })
 
 });
 
