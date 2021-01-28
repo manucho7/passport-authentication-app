@@ -8,7 +8,7 @@ import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import User from './User';
 import dotenv from 'dotenv';
-import { UserInterface } from './Interfaces/UserInterface';
+import { UserInterface, DatabaseUserInterface } from './Interfaces/UserInterface';
 
 const LocalStrategy = passportLocal.Strategy
 
@@ -38,7 +38,7 @@ app.use(passport.session());
 
 //Passport
 passport.use(new LocalStrategy((username: string, password: string, done) => {
-  User.findOne({ username: username }, (err: Error, user: any) => {
+  User.findOne({ username: username }, (err: Error, user: DatabaseUserInterface) => {
     if (err) throw err;
     if (!user) return done(null, false);
     bcrypt.compare(password, user.password, (err, result: boolean) => {
@@ -54,15 +54,16 @@ passport.use(new LocalStrategy((username: string, password: string, done) => {
 );
 
 //Interaction with cookies in the browser
-passport.serializeUser((user: any, cb) => {
-  cb(null, user.id);
+passport.serializeUser((user: DatabaseUserInterface, cb) => {
+  cb(null, user._id);
 });
 
 passport.deserializeUser((id: string, cb) => {
-  User.findOne({ _id: id }, (err: Error, user: any) => {
-    const userInformation = {
+  User.findOne({ _id: id }, (err: Error, user: DatabaseUserInterface) => {
+    const userInformation: UserInterface = {
       username: user.username,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      id: user._id
     };
     cb(err, userInformation);
   });
@@ -97,9 +98,9 @@ app.post('/register', async (req: Request, res: Response) => {
 });
 
 //Login Route
-app.post("/login", passport.authenticate("local", (req, res) => {
+app.post("/login", passport.authenticate("local"), (req, res) => {
   res.send("Succesfully Authenticated");
-}));
+});
 
 //Get user currently logged in Route
 app.get("/user", (req, res) => {
