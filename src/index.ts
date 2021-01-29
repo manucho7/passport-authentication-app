@@ -107,6 +107,12 @@ app.get("/user", (req, res) => {
   res.send(req.user);
 });
 
+//Logout Route
+app.get("/logout", (req, res) => {
+  req.logOut();
+  res.send("Successfully logged out");
+});
+
 app.listen('4000', () => {
   console.log("Server started successfully");
 });
