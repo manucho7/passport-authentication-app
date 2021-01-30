@@ -1,5 +1,5 @@
 import mongoose, { Error } from 'mongoose';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import passport from 'passport';
 import passportLocal from 'passport-local';
@@ -98,6 +98,11 @@ app.post('/register', async (req: Request, res: Response) => {
 
 });
 
+//Middleware
+// const isAdministratorMiddleware = (req: Request, res: Response, next: NextFunction) => {
+
+// }
+
 //Login Route
 app.post("/login", passport.authenticate("local"), (req, res) => {
   res.send("Succesfully Authenticated");
@@ -112,6 +117,15 @@ app.get("/user", (req, res) => {
 app.get("/logout", (req, res) => {
   req.logOut();
   res.send("Successfully logged out");
+});
+
+//Delete user Route
+app.post("/deleteuser", async (req, res) => {
+  const { id } = req?.body;
+  await User.findByIdAndDelete(id, (err: Error) => {
+    if (err) throw err;
+  });
+  res.send("Successfully deleted");
 });
 
 app.get("/getallusers", async (req, res) => {
