@@ -87,7 +87,8 @@ app.post('/register', async (req: Request, res: Response) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
         username,
-        password: hashedPassword
+        password: hashedPassword,
+        isAdmin: true
       });
     
       await newUser.save();
@@ -111,6 +112,13 @@ app.get("/user", (req, res) => {
 app.get("/logout", (req, res) => {
   req.logOut();
   res.send("Successfully logged out");
+});
+
+app.get("/getallusers", async (req, res) => {
+  await User.find({}, (err: Error, data: UserInterface[]) => {
+    if (err) throw err;
+    res.send(data);
+  })
 });
 
 app.listen('4000', () => {
