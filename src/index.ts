@@ -99,9 +99,23 @@ app.post('/register', async (req: Request, res: Response) => {
 });
 
 //Middleware
-// const isAdministratorMiddleware = (req: Request, res: Response, next: NextFunction) => {
-
-// }
+const isAdministratorMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const { user }: any = req;
+  if (user) {
+    User.findOne({ username: user.username }, (err: Error, doc: UserInterface) => {
+      if (err) throw err;
+      if (doc?.isAdmin) {
+        next();
+      }
+      else {
+        res.send("Sorry only admins can perform this");
+      }
+    })
+  }
+  else {
+    res.send("Sorry you are not logged in.")
+  }
+}
 
 //Login Route
 app.post("/login", passport.authenticate("local"), (req, res) => {
@@ -120,15 +134,15 @@ app.get("/logout", (req, res) => {
 });
 
 //Delete user Route
-app.post("/deleteuser", async (req, res) => {
-  const { id } = req?.body;
-  await User.findByIdAndDelete(id, (err: Error) => {
-    if (err) throw err;
-  });
-  res.send("Successfully deleted");
-});
+// app.post("/deleteuser",isAdministratorMiddleware , async (req, res) => {
+//   const { id } = req?.body;
+//   await User.findByIdAndDelete(id, (err: Error) => {
+//     if (err) throw err;
+//   });
+//   res.send("Successfully deleted");
+// });
 
-app.get("/getallusers", async (req, res) => {
+app.get("/getallusers",isAdministratorMiddleware, async (req, res) => {
   await User.find({}, (err: Error, data: UserInterface[]) => {
     if (err) throw err;
     res.send(data);
