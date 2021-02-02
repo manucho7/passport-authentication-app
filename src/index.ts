@@ -145,7 +145,16 @@ app.get("/logout", (req, res) => {
 app.get("/getallusers",isAdministratorMiddleware, async (req, res) => {
   await User.find({}, (err: Error, data: UserInterface[]) => {
     if (err) throw err;
-    res.send(data);
+    const filteredUsers: any = [];
+    data.forEach((item: any) => {
+      const userInformation = {
+        id: item._id,
+        username: item.username,
+        isAdmin: item.isAdmin
+      }
+      filteredUsers.push(userInformation);
+    });
+    res.send(filteredUsers);
   })
 });
 
