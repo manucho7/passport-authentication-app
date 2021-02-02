@@ -1,8 +1,8 @@
 
 export interface UserInterface {
-  username: string,
-  isAdmin: boolean,
-  id: string
+  username: string;
+  isAdmin: boolean;
+  id: string;
 }
 
 export interface DatabaseUserInterface {
